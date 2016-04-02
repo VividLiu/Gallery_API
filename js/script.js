@@ -7,7 +7,27 @@ $("#searchForm").submit(function(e){
 
 	getPerson(g_name);
 	e.preventDefault();
-})
+});
+
+
+//data structure to store data
+var person = {
+    name: "monet",
+    birthplace: "Paris, France",
+    culture: "French",
+    databegin: "1840",
+    dateend: "1926"
+};
+
+var work = [
+    {
+        url: "http://nrs.harvard.edu/urn-3:HUAM:30366_dynmc",
+        title: "Gorge of the petit Ailly, Varengeville",
+        classification: "Paintings",
+        medium: "oil on canvas",
+        date: "1897"
+    }        
+];
 
 //-----------------------------------------------------------------------------------------
 // function getPerson
@@ -28,7 +48,8 @@ function getPerson(displayname) {
     })
     .done(function(result){
     
-        //console.log(result);
+        console.log("person information:");
+        console.log(result);
 
         var personid = result.records[0].personid;
         //console.log("personid: " + personid);
@@ -58,7 +79,7 @@ function getArtwork(pid, workType){
     })
     .done(function(result){
     
-        console.log("returned object:")
+        console.log("art information:");
         console.log(result);
 
         var records = result.records;
@@ -68,6 +89,8 @@ function getArtwork(pid, workType){
             imgUrls.push(records[i].images[0].baseimageurl);
         }
         console.log(imgUrls);
+
+        display(person, work);
 
     })
     .fail(errorHandler);
@@ -95,3 +118,48 @@ function errorHandler(jqXHR, exception) {
         console.log('Uncaught Error.\n' + jqXHR.responseText);
     }
 }
+
+//-----------------------------------------------------------------------------------------
+// function display
+//
+//-----------------------------------------------------------------------------------------
+function display(person, work){
+
+    //display portrait 
+    var porElem = $("#template div#bio_template").clone();
+    console.log(porElem);
+    porElem.find("p.name").html(person.name);
+    porElem.find("p.birthplace").html(person.birthplace);
+    porElem.find("p.date").html(person.databegin+"-"+person.dateend);
+
+    
+    $("section#portrait").append(porElem);
+
+    //display paintings
+    for(var i = 0; i < work.length; i++){
+        var paintElem = $("#template div#paint_template").clone();
+       
+        console.log(paintElem);
+        paintElem.find("img").attr("src", work[i].url);
+        paintElem.find("p.title").html(work[i].title);
+        paintElem.find("p.medium").html(work[i].medium);
+        paintElem.find("p.pdate").html(work[i].date);
+
+
+        $("section#paintings ul").append("<li></li>");
+        $("section#paintings ul li").append(paintElem);   
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
