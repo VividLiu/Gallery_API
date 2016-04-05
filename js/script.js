@@ -51,16 +51,26 @@ function getPerson(displayname) {
         console.log("person information:");
         console.log(result);
 
-        var personid = result.records[0].personid;
-        //console.log("personid: " + personid);
-        //put person information into data structure
-        person.name = result.records[0].alphasort;
-        person.birthplace = result.records[0].birthplace;
-        person.culture = result.records[0].culture;
-        person.datebegin = result.records[0].databegin;
-        person.dateend = result.records[0].dateend;
+        if(result.records.length > 0){
+                var personid = result.records[0].personid;
+            //console.log("personid: " + personid);
+            //put person information into data structure
+            person.name = result.records[0].alphasort;
+            person.birthplace = result.records[0].birthplace;
+            person.culture = result.records[0].culture;
+            person.datebegin = result.records[0].datebegin;
+            person.dateend = result.records[0].dateend;
 
-        getArtwork(personid, "Paintings");
+            getArtwork(personid, "Paintings");    
+        }else{// no result found
+             //clear previous display
+            $("section#portrait .bio_template").remove();
+            $("section#paintings ul").html(" ");   
+
+            alert("no artist found!");
+
+        }
+
 
     })
     .fail(errorHandler);
@@ -99,18 +109,21 @@ function getArtwork(pid, workType){
         //put art work information into data structure
         work = [];
 
-        for(var i = 0; i < 3; i++){
-            console.log(i);
-            var tmp = {};
-            tmp["url"] = result.records[i].images[0].baseimageurl;
-            tmp["title"] = result.records[i].title;
-            tmp["classification"] = result.records[i].classification;
-            tmp["medium"] = result.records[i].medium;
-            tmp["date"] = result.records[i].dated;
+        var i = 0;
+        while(i < 3 && i < result.records.length){
+            if(result.records[i].images[0] != null){
+                console.log(i);
+                var tmp = {};
+                tmp["url"] = result.records[i].images[0].baseimageurl;
+                tmp["title"] = result.records[i].title;
+                tmp["classification"] = result.records[i].classification;
+                tmp["medium"] = result.records[i].medium;
+                tmp["date"] = result.records[i].dated;
             
-            work.push(tmp);
+                work.push(tmp);   
+            }
+            i++;
         }
-
         display(person, work);
 
     })
