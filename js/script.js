@@ -15,18 +15,18 @@ var person = {
     name: "monet",
     birthplace: "Paris, France",
     culture: "French",
-    databegin: "1840",
+    datebegin: "1840",
     dateend: "1926"
 };
 
 var work = [
-    {
-        url: "http://nrs.harvard.edu/urn-3:HUAM:30366_dynmc",
-        title: "Gorge of the petit Ailly, Varengeville",
-        classification: "Paintings",
-        medium: "oil on canvas",
-        date: "1897"
-    }        
+    // {
+    //     url: "http://nrs.harvard.edu/urn-3:HUAM:30366_dynmc",
+    //     title: "Gorge of the petit Ailly, Varengeville",
+    //     classification: "Paintings",
+    //     medium: "oil on canvas",
+    //     date: "1897"
+    // }        
 ];
 
 //-----------------------------------------------------------------------------------------
@@ -53,6 +53,12 @@ function getPerson(displayname) {
 
         var personid = result.records[0].personid;
         //console.log("personid: " + personid);
+        //put person information into data structure
+        person.name = result.records[0].alphasort;
+        person.birthplace = result.records[0].birthplace;
+        person.culture = result.records[0].culture;
+        person.datebegin = result.records[0].databegin;
+        person.dateend = result.records[0].dateend;
 
         getArtwork(personid, "Paintings");
 
@@ -85,10 +91,25 @@ function getArtwork(pid, workType){
         var records = result.records;
         var imgUrls = [];
 
-        for(var i = 0; i < records.length; i++){
-            imgUrls.push(records[i].images[0].baseimageurl);
+        // for(var i = 0; i < records.length; i++){
+        //     imgUrls.push(records[i].images[0].baseimageurl);
+        // }
+        // console.log(imgUrls);
+
+        //put art work information into data structure
+        work = [];
+
+        for(var i = 0; i < 3; i++){
+            console.log(i);
+            var tmp = {};
+            tmp["url"] = result.records[i].images[0].baseimageurl;
+            tmp["title"] = result.records[i].title;
+            tmp["classification"] = result.records[i].classification;
+            tmp["medium"] = result.records[i].medium;
+            tmp["date"] = result.records[i].dated;
+            
+            work.push(tmp);
         }
-        console.log(imgUrls);
 
         display(person, work);
 
@@ -125,19 +146,22 @@ function errorHandler(jqXHR, exception) {
 //-----------------------------------------------------------------------------------------
 function display(person, work){
 
+    //clear previous display
+    $("section#portrait .bio_template").remove();
+    $("section#paintings ul").html(" ");
     //display portrait 
-    var porElem = $("#template div#bio_template").clone();
+    var porElem = $("#template div.bio_template").clone();
     console.log(porElem);
     porElem.find("p.name").html(person.name);
     porElem.find("p.birthplace").html(person.birthplace);
-    porElem.find("p.date").html(person.databegin+"-"+person.dateend);
+    porElem.find("p.date").html(person.datebegin+"-"+person.dateend);
 
     
     $("section#portrait").append(porElem);
 
     //display paintings
     for(var i = 0; i < work.length; i++){
-        var paintElem = $("#template div#paint_template").clone();
+        var paintElem = $("#template div.paint_template").clone();
        
         console.log(paintElem);
         paintElem.find("img").attr("src", work[i].url);
@@ -147,7 +171,7 @@ function display(person, work){
 
 
         $("section#paintings ul").append("<li></li>");
-        $("section#paintings ul li").append(paintElem);   
+        $("section#paintings ul li:last-child").append(paintElem);   
     }
 
 }
